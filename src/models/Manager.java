@@ -66,7 +66,7 @@ public class Manager {
 
 	private MyProcess searchInList(String name, ArrayList<MyProcess> myProcesses) {
 		for (MyProcess myProcess : myProcesses) {
-			if (name.equals(myProcess.getName())) {
+			if (name.equalsIgnoreCase(myProcess.getName())) {
 				return myProcess;
 			}
 		}
@@ -74,9 +74,12 @@ public class Manager {
 	}
 
 	public MyProcess search(String name) {
-		for (MyProcess myProcess : processes) {
-			if (myProcess.getName().equalsIgnoreCase(name)) {
-				return myProcess;
+		Node<MyProcess> temp = processQueueReady.peek();
+		while (temp != null) {
+			if (temp.getData().getName().equals(name)) {
+				return temp.getData();
+			} else {
+				temp = temp.getNext();
 			}
 		}
 		return null;
@@ -164,7 +167,7 @@ public class Manager {
 		positionName++;
 		long size = partition.getSize() + partition2.getSize();
 		String report = partition.getName() + " se une con " + partition2.getName() + " y forman " + "PAR"
-				+ positionName + " con un tamaño de :" + size;
+				+ positionName + " con un tamaÃ±o de :" + size;
 		System.out.println(report);
 		joinsReports.add(report);
 		partition.setName("PAR" + positionName);
@@ -302,14 +305,23 @@ public class Manager {
 		return processInfo;
 	}
 
-	public static Object[][] processPartitionsTermiedInfo(ArrayList<Partition> termined) {
-		Object[][] processInfo = new Object[termined.size()][2];
-		for (int i = 0; i < termined.size(); i++) {
-			processInfo[i][0] = termined.get(i).getName();
-			processInfo[i][1] = termined.get(i).getTime();
+	public static String[] processJoinsInfo(ArrayList<String> joinsReports) {
+		String[] processInfo = new String[joinsReports.size()];
+		for (int i = 0; i < joinsReports.size(); i++) {
+			processInfo[i] = joinsReports.get(i);
 		}
 		return processInfo;
 	}
+
+	public static Object[][] processInitialPartitionsInfo(ArrayList<Partition> initialPartitions) {
+		Object[][] partitionsInfo = new Object[initialPartitions.size()][2];
+		for (int i = 0; i < initialPartitions.size(); i++) {
+			partitionsInfo[i][0] = initialPartitions.get(i).getName();
+			partitionsInfo[i][1] = initialPartitions.get(i).getSize();
+		}
+		return partitionsInfo;
+	}
+
 
 	public ArrayList<Partition> getPartitionsNews() {
 		return partitionsNews;
