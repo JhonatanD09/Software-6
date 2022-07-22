@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class PartitionReportsPanel extends JPanel {
 
-    private static final String[] COLUMNS = {"Nombre", "Tiempo", "TamaÃ±o", "Bloqueo"};
+    private static final String[] COLUMNS = {"Nombre", "Tiempo", "Tamaño", "Bloqueo"};
     private static final String[] OVER_SIZE_COLUMNS = {"Nombre", "Descripcion"};
 
     public PartitionReportsPanel(ArrayList<MyProcess> readyProcess, ArrayList<MyProcess> dispatchedProcess,

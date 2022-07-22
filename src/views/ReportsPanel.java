@@ -12,26 +12,26 @@ import models.MyProcess;
 
 public class ReportsPanel extends JPanel {
 
-    private static final String[] COLUMNS = {"Nombre", "Tiempo", "TamaÃ±o", "Bloqueo"};
+    private static final String[] COLUMNS = {"Nombre", "Tiempo", "Tamaño", "Bloqueo"};
     private static final String[] TERMINED_COLUMNS = {"Nombre", "Tiempo"};
-    private static final String[] INITIAL_PARTITIONS_COLUMNS = {"Nombre", "TamaÃ±o"};
+    private static final String[] INITIAL_PARTITIONS_COLUMNS = {"Nombre", "Tamaño"};
     private static final String[] JOIN_COLUMN = {"Descripcion"};
     private static final String NEW_SIMULATION_BTN_TXT = "Nueva simulacion";
     private static final Color BLUE_COLOR = Color.decode("#2980B9");
 
     public ReportsPanel(ActionListener listener, ArrayList<Partition> partitions, ArrayList<MyProcess> processes,
                         ArrayList<Partition> initialPartitions, ArrayList<MyProcess> processesTermined,
-                        ArrayList<String> joinsInfo){
+                        ArrayList<String> joinsInfo, Partition finalPartition ){
         setLayout(new BorderLayout());
         setBackground(Color.decode("#FDFEFE"));
         initTitle();
-        addReports(partitions, processes, initialPartitions, processesTermined,joinsInfo);
+        addReports(partitions, processes, initialPartitions, processesTermined,joinsInfo,finalPartition);
         initNewSimulationBtn(listener);
     }
 
     public void addReports(ArrayList<Partition> partitions, ArrayList<MyProcess> processes,
                            ArrayList<Partition> initialPartitions, ArrayList<MyProcess> processesTermined,
-                           ArrayList<String> joinsInfo){
+                           ArrayList<String> joinsInfo, Partition finalPartition){
         JTabbedPane reports = new JTabbedPane();
         reports.setFont(new Font("Arial", Font.BOLD, 18));
         for(Partition partition : partitions){
@@ -49,6 +49,8 @@ public class ReportsPanel extends JPanel {
 
         TablePanel terminedProcessesTable = new TablePanel(Manager.processProcessTermiedInfo(processesTermined), TERMINED_COLUMNS);
         reports.add("Orden terminacion procesos", terminedProcessesTable);
+        
+        reports.add("Particion final",new JLabel("La particion final es: "+ finalPartition.getName() + " con un tamaño de : "+ finalPartition.getSize()));
 
         JList<Object> joinsInfoReport = new JList<>(joinsInfo.toArray());
         joinsInfoReport.setFont(new Font("Arial", Font.BOLD, 16));

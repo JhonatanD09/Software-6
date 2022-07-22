@@ -329,12 +329,12 @@ public class Manager {
 
 	public static void main(String[] args) {
 		Manager manager = new Manager();
-		manager.addProcess(new MyProcess("P1", 26, 10, false));
-		manager.addProcess(new MyProcess("P2", 12, 20, false));
-		manager.addProcess(new MyProcess("P3", 23, 30, false));
-		manager.addProcess(new MyProcess("P4", 10, 20, false));
-		manager.addProcess(new MyProcess("P5", 24, 5, false));
-		manager.addProcess(new MyProcess("P6", 15, 15, false));
+		manager.addProcess(new MyProcess("P1", 24, 10, false));
+		manager.addProcess(new MyProcess("P2", 5, 10, false));
+		manager.addProcess(new MyProcess("P3", 23, 10, false));
+		manager.addProcess(new MyProcess("P4", 10, 10, false));
+//		manager.addProcess(new MyProcess("P5", 24, 5, false));
+//		manager.addProcess(new MyProcess("P6", 15, 15, false));
 
 		manager.initSimulation();
 
@@ -343,5 +343,9 @@ public class Manager {
 		for (Partition par : manager.getPartitionsNews()) {
 			System.out.println(par.getName() + " " + par.getSize());
 		}
+	}
+
+	public Partition getFinalPartition() {
+		return partitionsNews.get(partitionsNews.size()-1);
 	}
 }

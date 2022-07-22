@@ -63,7 +63,7 @@ public class AddProcessPanel extends MyGridPanel{
     }
 
     private void initProcessSizeTxt(){
-        JLabel sizeLb = createLb("   TamaÃ±o: ", new Font("Arial", Font.BOLD, 14));
+        JLabel sizeLb = createLb("   Tamaño: ", new Font("Arial", Font.BOLD, 14));
         addComponent(sizeLb, 2, 9, 2, 0.1);
         processSizeTxt = new JTextField();
         processSizeTxt.setText("");

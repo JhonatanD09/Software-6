@@ -17,7 +17,7 @@ public class ProcessPanel extends MyGridPanel{
 
     private static final String LB_NAME_TXT = "Nombre: ";
     private static final String LB_TIME_TXT = "Tiempo: ";
-    private static final String LB_SIZE_TXT = "TamaÃ±o: ";
+    private static final String LB_SIZE_TXT = "Tamaño: ";
     private static final String LB_IS_BLOCKED_TXT = "Bloqueo: ";
     private static final String EDIT_BTN_TXT = "Editar";
     private static final String DELETE_BTN_TXT = "Eliminar";

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
 
-    private static final String TITLE = "Software 1";
+    private static final String TITLE = "Software 6";
     private ActionListener listener;
     private MainPanel mainPanel;
 
@@ -37,8 +37,8 @@ public class MainFrame extends JFrame {
 
     public void initReportsPanel(ArrayList<Partition> partitions, ArrayList<MyProcess> processes,
                                  ArrayList<Partition> initialPartitions, ArrayList<MyProcess> processesTermined,
-                                 ArrayList<String> joinsInfo){
-        mainPanel.initReportsPanel(partitions, processes, initialPartitions, processesTermined, joinsInfo);
+                                 ArrayList<String> joinsInfo, Partition finalPartition){
+        mainPanel.initReportsPanel(partitions, processes, initialPartitions, processesTermined, joinsInfo, finalPartition);
     }
 
     public void newSimulation(){

@@ -68,7 +68,7 @@ public class Presenter implements ActionListener {
         if(!manager.getProcesses().isEmpty()){
             manager.initSimulation();
             mainFrame.initReportsPanel(manager.getPartitions(), manager.getProcesses(), manager.getPartitions(),
-                    manager.getProcessesTermined(), manager.getJoinsReports());
+                    manager.getProcessesTermined(), manager.getJoinsReports(),manager.getFinalPartition());
         }else{
             JOptionPane.showMessageDialog(mainFrame, "Debe haber almenos un proceso para poder iniciar la simulacion",
                     "ALERTA", JOptionPane.INFORMATION_MESSAGE);
