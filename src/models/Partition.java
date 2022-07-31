@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Partition implements Comparable<Partition>{
 
 	private static final int timeSystem = 1;
-	private String name;
+	private String name, data;
 	private long size;
         private long time;
 	private ArrayList<MyProcess> processesQueue;
@@ -37,13 +37,14 @@ public class Partition implements Comparable<Partition>{
 		this.isJoin = false;
 	}
 	
-	public Partition(String name , long size, long time) {
+	public Partition(String name , long size, long time, String data) {
 		this.name = name;
 		this.size = size;
 		this.isFinished = true;
 		this.isFree = true;
 		this.process = null;
 		this.time = time;
+		this.data = data;
 	}
 
 	public void valideSystemTimer() {
@@ -230,6 +231,10 @@ public class Partition implements Comparable<Partition>{
 	
 	public void setMyProcess(MyProcess myProcess) {
 		this.process = myProcess;
+	}
+	
+	public String getData() {
+		return data;
 	}
 	
     @Override

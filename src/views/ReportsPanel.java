@@ -14,10 +14,9 @@ import models.MyProcess;
 
 public class ReportsPanel extends JPanel {
 
-    private static final String[] COLUMNS = {"Nombre", "Tiempo", "Tamaño", "Bloqueo"};
     private static final String[] TERMINED_COLUMNS = {"Nombre", "Tiempo"};
     private static final String[] INITIAL_PARTITIONS_COLUMNS = {"Nombre", "Tamaño"};
-    private static final String[] JOIN_COLUMN = {"Descripcion"};
+    private static final String[] INITIAL_PARTITIONS_COLUMNS2 = {"Nombre","Proceso", "Tamaño"};
     private static final String NEW_SIMULATION_BTN_TXT = "Nueva simulacion";
     private static final Color BLUE_COLOR = Color.decode("#2980B9");
 
@@ -53,8 +52,8 @@ public class ReportsPanel extends JPanel {
                 INITIAL_PARTITIONS_COLUMNS);
         reports.add("Terminacion de particiones", reportTerminatedPartitions);
         
-        TablePanel reportAllPartitions = new TablePanel(Manager.processInitialPartitionsInfo(terminatedPartitions),
-                INITIAL_PARTITIONS_COLUMNS);
+        TablePanel reportAllPartitions = new TablePanel(Manager.allPartitions(terminatedPartitions),
+                INITIAL_PARTITIONS_COLUMNS2);
         reports.add("Particiones creadas", reportAllPartitions);
         
         TablePanel terminedProcessesTable = new TablePanel(Manager.processProcessTermiedInfo(processesTermined), TERMINED_COLUMNS);

@@ -162,7 +162,7 @@ public class Manager {
 		}
 		finalReportString += " y formaron " + ("PAR" + count) + " con un tamaño de " + size;
 		joinsReports.add(finalReportString);
-		allPartitions.add(new Partition("PAR" + count, size, 0));
+		allPartitions.add(new Partition("PAR" + count, size, 0,"Condensacion"));
 	}
 
 	private void dobleCondesacion(int i) {
@@ -173,7 +173,7 @@ public class Manager {
 		joinsReports.add(report);
 		originalPartition.setName("PAR" + count);
 		originalPartition.setSize(size);
-		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize(),0,"Condensacion"));
 		partitions.remove(i + 1);
 		count++;
 
@@ -183,7 +183,7 @@ public class Manager {
 		joinsReports.add(repoert2);
 		originalPartition.setName("PAR" + count);
 		originalPartition.setSize(size);
-		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize(),0,"Condensacion"));
 		partitions.remove(i - 1);
 		count++;
 	}
@@ -196,7 +196,7 @@ public class Manager {
 		joinsReports.add(report);
 		originalPartition.setName("PAR" + count);
 		originalPartition.setSize(size);
-		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize(),0,"Condensacion"));
 		partitions.remove(i);
 		count++;
 	}
@@ -215,20 +215,20 @@ public class Manager {
 	}
 
 	private void joinProcess(Node<MyProcess> node, int i) {
-		Partition partitionN = new Partition("PAR" + count, node.getData().getSize());
+		Partition partitionN = new Partition("PAR" + count, node.getData().getSize(),node.getData().getTime(),node.getData().getName());
 		long size = partitions.get(i).getSize() - node.getData().getSize();
 		partitions.get(i).setName("PAR" + count);
 		partitions.get(i).setSize(node.getData().getSize());
 		partitions.get(i).setMyProcess(node.getData());
 		partitions.get(i).setFinished(false);
 		partitionsTerminated
-				.add(new Partition(partitions.get(i).getName(), partitions.get(i).getSize(), node.getData().getTime()));
+				.add(new Partition(partitions.get(i).getName(), partitions.get(i).getSize(), node.getData().getTime(),node.getData().getName()));
 		processesTermined.add(new MyProcess(node.getData().getName(), node.getData().getTime(),
 				node.getData().getSize(), node.getData().isLocked()));
 		allPartitions.add(partitionN);
 		count++;
 		if (size > 0) {
-			Partition partitionNL = new Partition("PAR" + count, size, 0);
+			Partition partitionNL = new Partition("PAR" + count, size, 0,"libre");
 			allPartitions.add(partitionNL);
 			partitions.add(i + 1, partitionNL);
 			count++;
@@ -259,8 +259,8 @@ public class Manager {
 				MyProcess pMyProcess = processQueueReady.pop();
 				partition.setMyProcess(pMyProcess);
 				partitions.add(partition);
-				allPartitions.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime()));
-				partitionsTerminated.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime()));
+				allPartitions.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime(),pMyProcess.getName()));
+				partitionsTerminated.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime(),""));
 				processesTermined.add(new MyProcess(pMyProcess.getName(), pMyProcess.getTime(), pMyProcess.getSize(),
 						pMyProcess.isLocked()));
 				count++;
@@ -412,6 +412,16 @@ public class Manager {
 		}
 		return partitionsInfo;
 	}
+	
+	public static Object[][] allPartitions(ArrayList<Partition> initialPartitions) {
+		Object[][] partitionsInfo = new Object[initialPartitions.size()][3];
+		for (int i = 0; i < initialPartitions.size(); i++) {
+			partitionsInfo[i][0] = initialPartitions.get(i).getName();
+			partitionsInfo[i][1] = initialPartitions.get(i).getData();
+			partitionsInfo[i][2] = initialPartitions.get(i).getSize();
+		}
+		return partitionsInfo;
+	}
 
 	public static Object[][] processInfo(ArrayList<MyProcess> processes) {
 
@@ -447,8 +457,9 @@ public class Manager {
 		System.out.println("-------------------------------");
 		manager.getProcesses();
 
-		for (String repor : manager.getJoinsReports()) {
-			System.out.println(repor);
+		for (Partition repor : manager.getAllPartitions()) {
+			System.out.println(repor.getData());
+			
 		}
 
 	}
