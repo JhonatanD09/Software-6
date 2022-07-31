@@ -53,14 +53,14 @@ public class MainPanel extends MyGridPanel {
         }
     }
 
-    public void initReportsPanel(ArrayList<Partition> partitions, ArrayList<MyProcess> processes,
-                                 ArrayList<Partition> initialPartitions, ArrayList<MyProcess> processesTermined,
+    public void initReportsPanel(ArrayList<MyProcess> processes,
+                                 ArrayList<Partition> initialPartitions,ArrayList<Partition> terminatedPartitions, ArrayList<MyProcess> processesTermined,
                                  ArrayList<String> joinsInfo, Partition finalPartition){
         this.remove(startSimulationPanel);
         this.remove(processesPanel);
         processesPanel.setBorder(BorderFactory.createMatteBorder(2, 2,2,0, Color.BLACK));
         addComponent(processesPanel, 0, 1, 3, 1);
-        reportsPanel = new ReportsPanel(listener ,partitions, processes, initialPartitions, processesTermined, joinsInfo,finalPartition);
+        reportsPanel = new ReportsPanel(listener, processes, initialPartitions,terminatedPartitions, processesTermined, joinsInfo,finalPartition);
         addComponent(reportsPanel, 3,1,9,0.8);
         updateUI();
     }

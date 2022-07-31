@@ -37,6 +37,20 @@ public class Queue<T> {
 		return size;
 	}
 
+	public void delete(Node<T> data) {
+		Node<T> actualNode = firstNode;
+		if (data == actualNode) {
+			firstNode = firstNode.getNext();
+		}
+		while(actualNode != null){
+			if (actualNode.getNext() != null && actualNode.getNext()==data) {
+				actualNode.setNext(actualNode.getNext().getNext());
+			}else {
+				actualNode = actualNode.getNext();
+			}
+		}
+	}
+	
 	public boolean isEmpty() {
 		return firstNode == null;
 	}

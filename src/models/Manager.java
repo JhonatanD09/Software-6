@@ -11,20 +11,26 @@ public class Manager {
 	private ArrayList<MyProcess> processes;
 	private ArrayList<MyProcess> processesTermined;
 	private Queue<MyProcess> processQueueReady;
-	private int positionName;
-	private ArrayList<Partition> partitionsNews;
-	private ArrayList<String> joinsReports;
+	private ArrayList<Partition> allPartitions; // esta se usa
+	private ArrayList<Partition> partitionsTerminated; // esta si se usa
+	private ArrayList<String> joinsReports; // esta si se usa
+	private int memorySize;
+	private int count;
 
 	public Manager() {
 		this.processQueueReady = new Queue<>();
-		partitions = new ArrayList<>();
+		this.partitions = new ArrayList<>();
 		this.processes = new ArrayList<MyProcess>();
-		partitionsNews = new ArrayList<>();
-		joinsReports = new ArrayList<>();
+		this.partitionsTerminated = new ArrayList<>();
+		this.joinsReports = new ArrayList<>();
+		this.allPartitions = new ArrayList<>();
+		processesTermined = new ArrayList<>();
+		this.memorySize = 0;
+		this.count = 1;
 	}
 
 	public void addPartition(String name, long size) {
-		partitions.add(new Partition(name, size, this.processQueueReady, this.processes));
+		partitions.add(new Partition(name, size));
 	}
 
 	public Partition searchPartition(String name) {
@@ -123,90 +129,145 @@ public class Manager {
 	}
 
 	public void initSimulation() {
-		createNewsPartitions();
-		lisTermitatedOrder();
-		int count = 0;
-		positionName = partitions.size();
+		createPartitions();
+		int i = 0;
 		while (!processQueueReady.isEmpty()) {
-			MyProcess process = processQueueReady.peek().getData();
-			if (count >= partitions.size()) {
-				count = 0;
-			}
-			if (!partitions.get(count).isFinished()) {
-				partitions.get(count).valideSystemTimer(process);
+			if (i == partitions.size()) {
+				i = 0;
 			}
 
-			if (partitions.get(count).isFinished()) {
-				updatePartition(partitions.get(count));
-			}
-			checkJoin();
-			count++;
-		}
-	}
+			partitions.get(i).valideSystemTimer();
 
-	private void lisTermitatedOrder() {
-		processesTermined = new ArrayList<>(processes);
-		Collections.sort(processesTermined);
-	}
-
-	private void checkJoin() {
-		boolean join = true;
-		while (join) {
-			join = join() > 1;
-			for (int i = 0; i < partitionsNews.size(); i++) {
-				if (partitionsNews.get(i).isFinished()) {
-					if (i + 1 < partitionsNews.size() && partitionsNews.get(i + 1).isFinished()) {
-						updateNewPartition(partitionsNews.get(i), partitionsNews.get(i + 1));
+			if (partitions.get(i).isFinished()) {
+				if (i + 1 < partitions.size() && i - 1 >= 0) {
+					if (partitions.get(i - 1).isFinished() && partitions.get(i + 1).isFinished()) {
+						dobleCondesacion(i);
+					} else if (partitions.get(i - 1).isFinished()) {
+						condesacion(i, (i - 1));
+					} else if (partitions.get(i + 1).isFinished()) {
+						condesacion(i, (i + 1));
 					}
 				}
+				nextProccess();
 			}
+
+			i++;
 		}
+
+		int size = 0;
+		String finalReportString = "Condesacion de :";
+		for (Partition partition : partitions) {
+			size += partition.getSize();
+			finalReportString += partition.getName() + ", ";
+		}
+		finalReportString += " y formaron " + ("PAR" + count) + " con un tamaño de " + size;
+		joinsReports.add(finalReportString);
+		allPartitions.add(new Partition("PAR" + count, size, 0));
 	}
 
-	private void updateNewPartition(Partition partition, Partition partition2) {
-		positionName++;
-		long size = partition.getSize() + partition2.getSize();
-		String report = partition.getName() + " se une con " + partition2.getName() + " y forman " + "PAR"
-				+ positionName + " con un tamaÃ±o de :" + size;
-		System.out.println(report);
+	private void dobleCondesacion(int i) {
+		Partition originalPartition = partitions.get(i);
+		long size = partitions.get(i + 1).getSize() + originalPartition.getSize();
+		String report = "Condensacion de :" + originalPartition.getName() + " con " + partitions.get(i + 1).getName()
+				+ " y formaron " + ("PAR" + count) + " con un tamaño de " + size;
 		joinsReports.add(report);
-		partition.setName("PAR" + positionName);
-		partition.setSize(size);
-		partition.setFinished(true);
-		partitionsNews.remove(partition2);
+		originalPartition.setName("PAR" + count);
+		originalPartition.setSize(size);
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		partitions.remove(i + 1);
+		count++;
+
+		size = partitions.get(i - 1).getSize() + originalPartition.getSize();
+		String repoert2 = "Condensacion de :" + originalPartition.getName() + " con " + partitions.get(i - 1).getName()
+				+ " y formaron " + ("PAR" + count) + " con un tamaño de " + size;
+		joinsReports.add(repoert2);
+		originalPartition.setName("PAR" + count);
+		originalPartition.setSize(size);
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		partitions.remove(i - 1);
+		count++;
 	}
 
-	private int join() {
-		int count = 0;
-		for (int i = 0; i < partitionsNews.size(); i++) {
-			if (partitionsNews.get(i).isFinished()) {
-				if (i + 1 < partitionsNews.size() && partitionsNews.get(i + 1).isFinished()) {
-					count++;
-				}
+	private void condesacion(int index, int i) {
+		Partition originalPartition = partitions.get(index);
+		long size = partitions.get(i).getSize() + originalPartition.getSize();
+		String report = "Condensacion de :" + originalPartition.getName() + " con " + partitions.get(i).getName()
+				+ " y formaron " + ("PAR" + count) + " con un tamaño de " + size;
+		joinsReports.add(report);
+		originalPartition.setName("PAR" + count);
+		originalPartition.setSize(size);
+		allPartitions.add(new Partition(originalPartition.getName(), originalPartition.getSize()));
+		partitions.remove(i);
+		count++;
+	}
+
+	private void nextProccess() {
+		Node<MyProcess> node = processQueueReady.peek();
+		while (node != null) {
+			int index = valideJoinProcess(node);
+			if (index > -1) {
+				joinProcess(node, index);
+				node = null;
+			} else {
+				node = node.getNext();
 			}
 		}
-		return count;
 	}
 
-	private void updatePartition(Partition p) {
-		for (Partition partition : partitionsNews) {
-			if (p.getName().equalsIgnoreCase(partition.getName())) {
-				partition.setFinished(true);
-			}
-		}
-	}
-
-	private void createNewsPartitions() {
-		Node<MyProcess> temp = processQueueReady.peek();
-		int count = 1;
-		while (temp != null) {
-			MyProcess process = temp.getData();
-			Partition partition = new Partition("PAR" + count, process.getSize(), processQueueReady, processes);
-			partitionsNews.add(new Partition(partition.getName(), partition.getSize(), processQueueReady, processes));
-			partitions.add(partition);
+	private void joinProcess(Node<MyProcess> node, int i) {
+		Partition partitionN = new Partition("PAR" + count, node.getData().getSize());
+		long size = partitions.get(i).getSize() - node.getData().getSize();
+		partitions.get(i).setName("PAR" + count);
+		partitions.get(i).setSize(node.getData().getSize());
+		partitions.get(i).setMyProcess(node.getData());
+		partitions.get(i).setFinished(false);
+		partitionsTerminated
+				.add(new Partition(partitions.get(i).getName(), partitions.get(i).getSize(), node.getData().getTime()));
+		processesTermined.add(new MyProcess(node.getData().getName(), node.getData().getTime(),
+				node.getData().getSize(), node.getData().isLocked()));
+		allPartitions.add(partitionN);
+		count++;
+		if (size > 0) {
+			Partition partitionNL = new Partition("PAR" + count, size, 0);
+			allPartitions.add(partitionNL);
+			partitions.add(i + 1, partitionNL);
 			count++;
-			temp = temp.getNext();
 		}
+		processQueueReady.delete(node);
+	}
+
+	private int valideJoinProcess(Node<MyProcess> proccess) {
+		for (int i = 0; i < partitions.size(); i++) {
+			if (partitions.get(i).getSize() >= proccess.getData().getSize() && partitions.get(i).isFinished()) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private void createPartitions() {
+		Node<MyProcess> process = processQueueReady.peek();
+		int sizeTemp = 0;
+		while (process != null) {
+			MyProcess temp = process.getData();
+			sizeTemp += temp.getSize();
+			if (sizeTemp > memorySize) {
+				process = null;
+			} else {
+				process = process.getNext();
+				Partition partition = new Partition("PAR" + count, temp.getSize());
+				MyProcess pMyProcess = processQueueReady.pop();
+				partition.setMyProcess(pMyProcess);
+				partitions.add(partition);
+				allPartitions.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime()));
+				partitionsTerminated.add(new Partition(partition.getName(), partition.getSize(), pMyProcess.getTime()));
+				processesTermined.add(new MyProcess(pMyProcess.getName(), pMyProcess.getTime(), pMyProcess.getSize(),
+						pMyProcess.isLocked()));
+				count++;
+			}
+		}
+		Collections.sort(partitionsTerminated);
+		Collections.sort(processesTermined);
 	}
 
 	public ArrayList<Partition> getPartitions() {
@@ -214,66 +275,66 @@ public class Manager {
 	}
 
 	public void show() {
-		System.out.println("Coloa general de listos");
-		for (MyProcess p : processes) {
-			System.out.println(p.getName() + " -- " + p.getTime() + " -- " + p.getSize());
-		}
-		System.out.println("----------------------------------------------------");
-		System.out.println("Particiones iniciales");
-		for (Partition p : partitions) {
-			System.out.println(p.getName() + " -- " + p.getSize());
-		}
+//		System.out.println("Coloa general de listos");
+//		for (MyProcess p : processes) {
+//			System.out.println(p.getName() + " -- " + p.getTime() + " -- " + p.getSize());
+//		}
+//		System.out.println("----------------------------------------------------");
+//		System.out.println("Particiones iniciales");
+//		for (Partition p : partitions) {
+//			System.out.println(p.getName() + " -- " + p.getSize());
+//		}
 //
-		System.out.println("----------------------------------------------------");
-		System.out.println("Reportes por particion");
-		for (Partition p : partitions) {
-			System.out.println("-----------------------" + p.getName() + "-----------------------------");
-			System.out.println("Listos y despachados");
-			if (p.getReadyProccess() != null) {
-				for (MyProcess process : p.getReadyProccess()) {
-					System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
-				}
-			}
-			System.out.println("----------------------------------------------------");
-			System.out.println("Ejecucion");
-			for (MyProcess process : p.getExecuting()) {
-				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
-			}
-
-			System.out.println("----------------------------------------------------");
-			System.out.println("Expirados");
-			for (MyProcess process : p.getProcessExpired()) {
-				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
-			}
-
-			System.out.println("----------------------------------------------------");
-			System.out.println("Bloqueo");
-			for (MyProcess process : p.getProcessLocked()) {
-				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
-			}
-
-			System.out.println("----------------------------------------------------");
-			System.out.println("Termiandos");
-			for (MyProcess process : p.getProcessTerminated()) {
-				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
-			}
-
-		}
+//		System.out.println("----------------------------------------------------");
+//		System.out.println("Reportes por particion");
+//		for (Partition p : partitions) {
+//			System.out.println("-----------------------" + p.getName() + "-----------------------------");
+//			System.out.println("Listos y despachados");
+//			if (p.getReadyProccess() != null) {
+//				for (MyProcess process : p.getReadyProccess()) {
+//					System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
+//				}
+//			}
+//			System.out.println("----------------------------------------------------");
+//			System.out.println("Ejecucion");
+//			for (MyProcess process : p.getExecuting()) {
+//				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
+//			}
 //
+//			System.out.println("----------------------------------------------------");
+//			System.out.println("Expirados");
+//			for (MyProcess process : p.getProcessExpired()) {
+//				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
+//			}
 //
+//			System.out.println("----------------------------------------------------");
+//			System.out.println("Bloqueo");
+//			for (MyProcess process : p.getProcessLocked()) {
+//				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
+//			}
+//
+//			System.out.println("----------------------------------------------------");
+//			System.out.println("Termiandos");
+//			for (MyProcess process : p.getProcessTerminated()) {
+//				System.out.println(process.getName() + " -- " + process.getTime() + " -- " + process.getSize());
+//			}
+//
+//		}
+////
+////
+////        System.out.println("----------------------------------------------------");
+////        System.out.println("Tiempo de terminacion de las particiones");
+////        Collections.sort(partitions);
+////        for (Partition p : partitions) {
+////            System.out.println(p.getName() + " -- " + p.getTime());
+////        }
+////
 //        System.out.println("----------------------------------------------------");
-//        System.out.println("Tiempo de terminacion de las particiones");
-//        Collections.sort(partitions);
-//        for (Partition p : partitions) {
+//        System.out.println("Orden de terminacion de los procesos");
+//        Collections.sort(processesTermined);
+//        for (MyProcess p : processesTermined) {
 //            System.out.println(p.getName() + " -- " + p.getTime());
 //        }
-//
-        System.out.println("----------------------------------------------------");
-        System.out.println("Orden de terminacion de los procesos");
-        Collections.sort(processesTermined);
-        for (MyProcess p : processesTermined) {
-            System.out.println(p.getName() + " -- " + p.getTime());
-        }
 	}
 
 	/**
@@ -284,10 +345,18 @@ public class Manager {
 		return processes;
 	}
 
+	/**
+	 * 
+	 * @return reporte de los procesos tterminados en orden
+	 */
 	public ArrayList<MyProcess> getProcessesTermined() {
 		return processesTermined;
 	}
-	
+
+	public void setMemorySize(int memorySize) {
+		this.memorySize = memorySize;
+	}
+
 	/**
 	 * 
 	 * @return reportes de uniones
@@ -295,6 +364,28 @@ public class Manager {
 	public ArrayList<String> getJoinsReports() {
 		return joinsReports;
 	}
+
+	/**
+	 * 
+	 * @return reporte de como terminan las particiones en orden
+	 */
+	public ArrayList<Partition> getPartitionsTerminated() {
+		return partitionsTerminated;
+	}
+
+	public int getMemorySize() {
+		return memorySize;
+	}
+
+	/**
+	 * 
+	 * @return Reporte de todas las partciones creadas
+	 */
+	public ArrayList<Partition> getAllPartitions() {
+		return allPartitions;
+	}
+//	public ArrayList<Partition> terminatedPartitions(){
+//	}
 
 	public static Object[][] processProcessTermiedInfo(ArrayList<MyProcess> termined) {
 		Object[][] processInfo = new Object[termined.size()][2];
@@ -322,30 +413,44 @@ public class Manager {
 		return partitionsInfo;
 	}
 
+	public static Object[][] processInfo(ArrayList<MyProcess> processes) {
 
-	public ArrayList<Partition> getPartitionsNews() {
-		return partitionsNews;
+		Object[][] processInfo = new Object[processes.size()][4];
+		for (int i = 0; i < processes.size(); i++) {
+			processInfo[i][0] = processes.get(i).getName();
+			processInfo[i][1] = processes.get(i).getTime();
+			processInfo[i][2] = processes.get(i).getSize();
+			processInfo[i][3] = processes.get(i).isLocked();
+		}
+		return processInfo;
+	}
+
+	public ArrayList<Partition> getx() {
+		return partitions;
 	}
 
 	public static void main(String[] args) {
 		Manager manager = new Manager();
-		manager.addProcess(new MyProcess("P1", 24, 10, false));
-		manager.addProcess(new MyProcess("P2", 5, 10, false));
-		manager.addProcess(new MyProcess("P3", 23, 10, false));
-		manager.addProcess(new MyProcess("P4", 10, 10, false));
-//		manager.addProcess(new MyProcess("P5", 24, 5, false));
-//		manager.addProcess(new MyProcess("P6", 15, 15, false));
+		manager.setMemorySize(50);
+		manager.addProcess(new MyProcess("P11", 5, 11, false));
+		manager.addProcess(new MyProcess("P15", 7, 15, false));
+		manager.addProcess(new MyProcess("P18", 8, 18, false));
+		manager.addProcess(new MyProcess("P6", 3, 6, false));
+		manager.addProcess(new MyProcess("P9", 4, 9, false));
+		manager.addProcess(new MyProcess("P13", 6, 13, false));
+		manager.addProcess(new MyProcess("P20", 2, 20, false));
 
 		manager.initSimulation();
 
 		manager.show();
 
-		for (Partition par : manager.getPartitionsNews()) {
-			System.out.println(par.getName() + " " + par.getSize());
+		System.out.println("-------------------------------");
+		manager.getProcesses();
+
+		for (String repor : manager.getJoinsReports()) {
+			System.out.println(repor);
 		}
+
 	}
 
-	public Partition getFinalPartition() {
-		return partitionsNews.get(partitionsNews.size()-1);
-	}
 }

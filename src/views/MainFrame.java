@@ -35,10 +35,10 @@ public class MainFrame extends JFrame {
         mainPanel.updateProcesses(processQueue);
     }
 
-    public void initReportsPanel(ArrayList<Partition> partitions, ArrayList<MyProcess> processes,
-                                 ArrayList<Partition> initialPartitions, ArrayList<MyProcess> processesTermined,
+    public void initReportsPanel( ArrayList<MyProcess> processes,
+                                 ArrayList<Partition> initialPartitions,ArrayList<Partition> terminatedPartitions, ArrayList<MyProcess> processesTermined,
                                  ArrayList<String> joinsInfo, Partition finalPartition){
-        mainPanel.initReportsPanel(partitions, processes, initialPartitions, processesTermined, joinsInfo, finalPartition);
+        mainPanel.initReportsPanel( processes, initialPartitions,terminatedPartitions, processesTermined, joinsInfo, finalPartition);
     }
 
     public void newSimulation(){
