@@ -1,6 +1,8 @@
 package views;
 
 
+import exceptions.EmptyMemorySizeException;
+import exceptions.InvalidMemorySizeException;
 import models.MyProcess;
 import models.Partition;
 import models.Queue;
@@ -46,5 +48,9 @@ public class MainFrame extends JFrame {
         mainPanel = new MainPanel(listener);
         add(mainPanel);
         getContentPane().revalidate();
+    }
+
+    public int getMemorySize() throws EmptyMemorySizeException, InvalidMemorySizeException {
+       return mainPanel.getMemorySize();
     }
 }

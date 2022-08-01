@@ -73,15 +73,19 @@ public class Presenter implements ActionListener {
 	}
 
 	private void manageInitSimulationAction() {
-		if (!manager.getProcesses().isEmpty()) {
-			manager.initSimulation();
-			System.out.print("tamamama" +manager.getProcesses().size());
-			mainFrame.initReportsPanel(manager.getProcesses(), manager.getPartitionsTerminated(),
-					manager.getAllPartitions(), manager.getProcessesTermined(), manager.getJoinsReports(),
-					manager.getAllPartitions().get(manager.getAllPartitions().size()-1));
-		} else {
-			JOptionPane.showMessageDialog(mainFrame, "Debe haber almenos un proceso para poder iniciar la simulacion",
-					"ALERTA", JOptionPane.INFORMATION_MESSAGE);
+		try {
+			manager.setMemorySize(mainFrame.getMemorySize());
+			if (!manager.getProcesses().isEmpty()) {
+				manager.initSimulation();
+				mainFrame.initReportsPanel(manager.getProcesses(), manager.getPartitionsTerminated(),
+						manager.getAllPartitions(), manager.getProcessesTermined(), manager.getJoinsReports(),
+						manager.getAllPartitions().get(manager.getAllPartitions().size()-1));
+			} else {
+				JOptionPane.showMessageDialog(mainFrame, "Debe haber almenos un proceso para poder iniciar la simulacion",
+						"ALERTA", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} catch (EmptyMemorySizeException | InvalidMemorySizeException e) {
+			JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "ERROR!!!", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

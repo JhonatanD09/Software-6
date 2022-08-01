@@ -1,29 +1,54 @@
 package views;
 
+import exceptions.*;
 import models.MyProcess;
 import models.Partition;
 import models.Queue;
 import presenters.Events;
 
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 public class MainPanel extends MyGridPanel {
 
+    private static final String SIZE_LB_TXT = "Tamaño de memoria: ";
+    private JPanel leftPanel;
     private ProcessesPanel processesPanel;
     private ReportsPanel reportsPanel;
     private MyGridPanel startSimulationPanel;
     private ActionListener listener;
+    private JTextField sizeTxt;
 
     public MainPanel(ActionListener listener) {
         this.listener = listener;
         setBackground(Color.decode("#FDFEFE"));
         initExitBtn();
-        processesPanel = new ProcessesPanel(listener);
-        addComponent(processesPanel, 0, 1, 2, 1);
+        initLeftPanel();
         initStartSimulationPanel();
+    }
+
+    private void initLeftPanel(){
+        leftPanel = new JPanel(new BorderLayout());
+        initMemorySizePanel();
+        processesPanel = new ProcessesPanel(listener);
+        leftPanel.add(processesPanel, BorderLayout.CENTER);
+        addComponent(leftPanel, 0, 1, 2, 1);
+    }
+
+    private void initMemorySizePanel(){
+        JPanel sizePanel = new JPanel(new GridLayout(1,2));
+        sizePanel.setBackground(Color.decode("#FDFEFE"));
+        JLabel sizeLb = new JLabel(SIZE_LB_TXT);
+        sizeLb.setFont(new Font("Arial", Font.BOLD, 20));
+        sizeTxt = new JTextField();
+        sizeTxt.setFont(new Font("Arial", Font.BOLD, 20));
+        sizePanel.add(sizeLb);
+        sizePanel.add(sizeTxt);
+        leftPanel.add(sizePanel, BorderLayout.NORTH);
     }
 
     private void initExitBtn(){
@@ -57,9 +82,9 @@ public class MainPanel extends MyGridPanel {
                                  ArrayList<Partition> initialPartitions,ArrayList<Partition> terminatedPartitions, ArrayList<MyProcess> processesTermined,
                                  ArrayList<String> joinsInfo, Partition finalPartition){
         this.remove(startSimulationPanel);
-        this.remove(processesPanel);
-        processesPanel.setBorder(BorderFactory.createMatteBorder(2, 2,2,0, Color.BLACK));
-        addComponent(processesPanel, 0, 1, 3, 1);
+        this.remove(leftPanel);
+        leftPanel.setBorder(BorderFactory.createMatteBorder(2, 2,2,0, Color.BLACK));
+        addComponent(leftPanel, 0, 1, 3, 1);
         reportsPanel = new ReportsPanel(listener, processes, initialPartitions,terminatedPartitions, processesTermined, joinsInfo,finalPartition);
         addComponent(reportsPanel, 3,1,9,0.8);
         updateUI();
@@ -77,5 +102,19 @@ public class MainPanel extends MyGridPanel {
 
     public void updateProcesses(ArrayList<MyProcess> processQueue){
         processesPanel.updateProcesses(processQueue);
+    }
+
+    public int getMemorySize() throws EmptyMemorySizeException, InvalidMemorySizeException {
+        String memorySize = sizeTxt.getText();
+        if(!memorySize.isEmpty()){
+            boolean isNumber = memorySize.chars().allMatch(Character::isDigit);
+            if(isNumber){
+                return Integer.parseInt(memorySize);
+            }else{
+                throw new InvalidMemorySizeException();
+            }
+        }else{
+            throw new EmptyMemorySizeException();
+        }
     }
 }
