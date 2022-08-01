@@ -19,14 +19,6 @@ public class Presenter implements ActionListener {
 
 	public Presenter() {
 		manager = new Manager();
-		manager.setMemorySize(50);
-		manager.addProcess(new MyProcess("P11", 5, 11, false));
-		manager.addProcess(new MyProcess("P15", 7, 15, false));
-		manager.addProcess(new MyProcess("P18", 8, 18, false));
-		manager.addProcess(new MyProcess("P6", 3, 6, false));
-		manager.addProcess(new MyProcess("P9", 4, 9, false));
-		manager.addProcess(new MyProcess("P13", 6, 13, false));
-		manager.addProcess(new MyProcess("P20", 2, 20, false));
 		mainFrame = new MainFrame(this);
 		mainFrame.setVisible(true);
 	}
